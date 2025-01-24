@@ -30,7 +30,7 @@ To run this plugin you need to use at least **Java 21** runtime environnement.
 You should also provide **config.json** file which contains the information about the plugin it self (the location shall be *./conf/conf_batch.conf*).  
 
 ### Working
-To deal with PBS and Slurm we use an SSH connection which replace the API of the Kubernetes plugin for example.  
+To deal with PBS and Slurm we use an SSH connection which replaces the API of the Kubernetes plugin for example.  
 
 ## Code
 ### Structure
