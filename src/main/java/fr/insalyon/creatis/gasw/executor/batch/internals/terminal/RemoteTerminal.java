@@ -51,8 +51,8 @@ public class RemoteTerminal {
             client.start();
 
         } catch (GeneralSecurityException | IOException e) {
-            log.error(e);
-            throw new GaswException("Failed to init");
+            log.error("Failed to init the SshClient!", e);
+            throw new GaswException("Failed to init the SshClient");
         }
     }
 
@@ -67,7 +67,7 @@ public class RemoteTerminal {
             session.auth().verify(config.getOptions().getSshEventTimeout(), TimeUnit.SECONDS);
 
         } catch (IOException e) {
-            log.error(e);
+            log.error("Failed to connect to ssh!", e);
             throw new GaswException("Failed to connect to ssh");
         }
     }
@@ -75,11 +75,11 @@ public class RemoteTerminal {
     public void disconnect() throws GaswException {
         try {
             session.disconnect(11, "Session ended");
-            client.stop();
         } catch (IOException e) {
-            log.error(e);
-            client.stop();
+            log.error("Failed to disconnect from ssh!", e);
             throw new GaswException("Failed to disconnect");
+        } finally {
+            client.stop();
         }
     }
 
@@ -90,7 +90,7 @@ public class RemoteTerminal {
         try {
             scpClient.upload(Paths.get(localFile), remoteLocation);
         } catch (IOException e) {
-            log.error(e);
+            log.error("Failed to upload file on remote!", e);
             throw new GaswException("Failed to upload file on remote !");
         }
     }
@@ -102,7 +102,7 @@ public class RemoteTerminal {
         try {
             scpClient.download(remoteFile, Paths.get(localLocation));
         } catch (IOException e) {
-            log.error(e);
+            log.error("Failed to download file on remote!", e);
             throw new GaswException("Failed to download file on remote !");
         }
     }
@@ -118,9 +118,9 @@ public class RemoteTerminal {
             channel.open().verify(config.getOptions().getCommandExecutionTimeout(), TimeUnit.SECONDS);
             channel.waitFor(EnumSet.of(ClientChannelEvent.CLOSED), config.getOptions().getSshEventTimeout());
 
-            return (new RemoteOutput(stdout.toString(), stderr.toString(), channel.getExitStatus()));
+            return new RemoteOutput(stdout.toString(), stderr.toString(), channel.getExitStatus());
         } catch (IOException e) {
-            log.error(e);
+            log.error("Failed to execute a command on remote!", e);
             return null;
         }
     }

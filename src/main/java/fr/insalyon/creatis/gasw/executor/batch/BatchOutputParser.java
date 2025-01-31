@@ -57,6 +57,6 @@ public class BatchOutputParser extends GaswOutputParser {
 
     @Override
     protected void resubmit() throws GaswException {
-        throw new GaswException("");
+        throw new GaswException("Resubmit not implemented in gasw-batch!");
     }
 }

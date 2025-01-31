@@ -3,6 +3,7 @@ package fr.insalyon.creatis.gasw.executor.batch.internals;
 import java.util.List;
 
 import fr.insalyon.creatis.gasw.executor.batch.config.json.properties.BatchConfig;
+import fr.insalyon.creatis.gasw.executor.batch.config.json.properties.BatchEngines;
 import fr.insalyon.creatis.gasw.executor.batch.internals.terminal.RemoteFile;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -33,5 +34,13 @@ public class BatchJobData {
 
     public String getStderrPath() {
         return getWorkingDir() + "err/" + getJobID() + ".err";
+    }
+
+    public String getBatchFile() {
+        return getWorkingDir() + getJobID() + ".batch";
+    }
+
+    public BatchEngines getEngine() {
+        return config.getOptions().getBatchEngine();
     }
 }

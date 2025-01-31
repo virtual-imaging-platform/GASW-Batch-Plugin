@@ -29,8 +29,8 @@ public class BatchJob {
         final BatchFile batchFile = new BatchFile(data);
         final RemoteOutput output;
 
-        output = new RemoteTerminal(data.getConfig()).oneCommand("echo -en '" + batchFile.build().toString() + "' > "
-                + data.getWorkingDir() + data.getJobID() + ".batch");
+        output = new RemoteTerminal(data.getConfig()).oneCommand("echo -en '" + batchFile.build() + "' > "
+                + data.getBatchFile());
 
         if (output == null || output.getExitCode() != 0 || ! output.getStderr().getContent().isEmpty()) {
             throw new GaswException("Impossible to create the batch file");
@@ -73,8 +73,8 @@ public class BatchJob {
     }
 
     public void submit() throws GaswException {
-        final BatchEngines engine = data.getConfig().getOptions().getBatchEngine();
-        final RemoteCommand command = engine.getSubmit(data.getWorkingDir() + data.getJobID() + ".batch");
+        final BatchEngines engine = data.getEngine();
+        final RemoteCommand command = engine.getSubmit(data.getBatchFile());
 
         try {
             command.execute(data.getConfig());
@@ -127,7 +127,7 @@ public class BatchJob {
     }
 
     private GaswStatus getStatusRequest() {
-        final BatchEngines engine = data.getConfig().getOptions().getBatchEngine();
+        final BatchEngines engine = data.getEngine();
         final RemoteCommand command = engine.getStatus(data.getBatchJobID());
         final String result;
 
@@ -178,7 +178,8 @@ public class BatchJob {
                 try {
                     Thread.sleep(data.getConfig().getOptions().getStatusRetryWait());
                 } catch (InterruptedException e) {
-                    log.trace(e);
+                    log.trace("Interrupted exception, exiting!", e);
+                    System.exit(1);
                 }
             }
         }

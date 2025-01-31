@@ -8,7 +8,7 @@ public class BatchFile {
     final private BatchJobData  data;
     final private StringBuilder builder = new StringBuilder(1024);
 
-    public StringBuilder build() {
+    public String build() {
         switch (data.getConfig().getOptions().getBatchEngine()) {
             case PBS:
                 doPBS();
@@ -19,7 +19,7 @@ public class BatchFile {
         }
         doCommon();
 
-        return builder;
+        return builder.toString();
     }
 
     private void doCommon() {

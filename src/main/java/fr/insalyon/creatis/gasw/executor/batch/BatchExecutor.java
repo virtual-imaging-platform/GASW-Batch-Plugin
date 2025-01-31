@@ -33,8 +33,7 @@ public class BatchExecutor implements ExecutorPlugin {
     @Override
     public void load(final GaswInput gaswInput) throws GaswException {
         if ( ! loaded) {
-            final ConfigBuilder configBuilder = new ConfigBuilder(Constants.PLUGIN_CONFIG);
-            final BatchConfig config = configBuilder.get();
+            final BatchConfig config = new ConfigBuilder(Constants.PLUGIN_CONFIG).get();
 
             manager = new BatchManager(GaswConfiguration.getInstance().getSimulationID(), config);
             manager.init();

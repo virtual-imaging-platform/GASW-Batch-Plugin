@@ -62,9 +62,9 @@ final public class BatchMonitor extends GaswMonitor {
                 Thread.sleep(GaswConfiguration.getInstance().getDefaultSleeptime());
 
             } catch (GaswException | DAOException ex) {
-                log.error("Ignored exception !", ex);
+                log.error("Exception while monitoring batch jobs. Ignoring to continue the monitoring!", ex);
             } catch (InterruptedException ex) {
-                log.error("Interrupted exception, stopping the worker !");
+                log.error("Interrupted exception, stopping the worker!");
                 finish();
             }
         }
