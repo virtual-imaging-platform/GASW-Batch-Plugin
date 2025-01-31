@@ -1,5 +1,6 @@
 package fr.insalyon.creatis.gasw.executor.batch.internals;
 
+import fr.insalyon.creatis.gasw.Gasw;
 import fr.insalyon.creatis.gasw.GaswException;
 import fr.insalyon.creatis.gasw.execution.GaswStatus;
 import fr.insalyon.creatis.gasw.executor.batch.config.json.properties.BatchEngines;
@@ -56,20 +57,15 @@ public class BatchJob {
     /**
      * Download all the data created by the jobs (not the app output) but the logs.
      */
-    public void download() {
+    public void download() throws GaswException {
         final RemoteTerminal rt = new RemoteTerminal(data.getConfig());
 
-        try {
-            rt.connect();
-            for (final RemoteFile file : data.getFilesDownload()) {
-                log.info("Downloading file : " + file.getSource());
-                rt.download(file.getSource(), file.getDest());
-            }
-            rt.disconnect();
-
-        } catch (GaswException e) {
-            log.error("Failed to download the files !", e);
+        rt.connect();
+        for (final RemoteFile file : data.getFilesDownload()) {
+            log.info("Downloading file : " + file.getSource());
+            rt.download(file.getSource(), file.getDest());
         }
+        rt.disconnect();
     }
 
     public void submit() throws GaswException {
