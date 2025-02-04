@@ -1,14 +1,22 @@
 package fr.insalyon.creatis.gasw.executor.batch.internals;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import fr.insalyon.creatis.gasw.GaswException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j;
 
 @RequiredArgsConstructor
-public class BatchFile {
+@Log4j
+public class BatchFileBuilder {
 
     final private BatchJobData  data;
     final private StringBuilder builder = new StringBuilder(1024);
 
-    public String build() {
+    public void build() throws GaswException {
         switch (data.getConfig().getOptions().getBatchEngine()) {
             case PBS:
                 doPBS();
@@ -18,8 +26,23 @@ public class BatchFile {
                 break;
         }
         doCommon();
+        createFile();
+    }
 
-        return builder.toString();
+    private void createFile() throws GaswException {
+        File batchFile = new File(data.getLocalBatchFile());
+
+        try {
+            if ( ! batchFile.exists()) {
+                batchFile.createNewFile();
+            }
+            try (FileOutputStream stream = new FileOutputStream(batchFile)) {
+                stream.write(builder.toString().getBytes());
+            }
+        } catch (IOException e) {
+            log.error("Failed to create the batch file!");
+            throw new GaswException("Failed to create the batch file!", e);
+        }
     }
 
     private void doCommon() {

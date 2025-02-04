@@ -10,7 +10,7 @@ import fr.insalyon.creatis.gasw.executor.batch.internals.commands.items.Tracejob
 import lombok.extern.log4j.Log4j;
 
 @Log4j
-public enum BatchEngines {
+public enum BatchEngine {
 
     SLURM(Sbatch.class, Scontrol.class),
     PBS(Qsub.class, Tracejob.class);
@@ -18,7 +18,7 @@ public enum BatchEngines {
     final private Class<? extends RemoteCommand> submit;
     final private Class<? extends RemoteCommand> status;
 
-    BatchEngines(Class<? extends RemoteCommand> submitCommand, Class<? extends RemoteCommand> statusCommand) {
+    BatchEngine(Class<? extends RemoteCommand> submitCommand, Class<? extends RemoteCommand> statusCommand) {
         this.submit = submitCommand;
         this.status = statusCommand;
     }
@@ -33,11 +33,11 @@ public enum BatchEngines {
         return null;
     }
 
-    public RemoteCommand getSubmit(final String data) {
+    public RemoteCommand getSubmitCommand(final String data) {
         return buidler(submit, data);
     }
 
-    public RemoteCommand getStatus(final String data) {
+    public RemoteCommand getStatusCommand(final String data) {
         return buidler(status, data);
     }
 }

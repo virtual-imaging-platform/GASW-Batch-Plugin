@@ -51,8 +51,8 @@ public class RemoteTerminal {
             client.start();
 
         } catch (GeneralSecurityException | IOException e) {
-            log.error("Failed to init the SshClient!", e);
-            throw new GaswException("Failed to init the SshClient");
+            log.error("Failed to init the SshClient!");
+            throw new GaswException("Failed to init the SshClient", e);
         }
     }
 
@@ -67,8 +67,8 @@ public class RemoteTerminal {
             session.auth().verify(config.getOptions().getSshEventTimeout(), TimeUnit.SECONDS);
 
         } catch (IOException e) {
-            log.error("Failed to connect to ssh!", e);
-            throw new GaswException("Failed to connect to ssh");
+            log.error("Failed to connect to ssh!");
+            throw new GaswException("Failed to connect to ssh", e);
         }
     }
 
@@ -76,8 +76,8 @@ public class RemoteTerminal {
         try {
             session.disconnect(11, "Session ended");
         } catch (IOException e) {
-            log.error("Failed to disconnect from ssh!", e);
-            throw new GaswException("Failed to disconnect");
+            log.error("Failed to disconnect from ssh!");
+            throw new GaswException("Failed to disconnect", e);
         } finally {
             client.stop();
         }
@@ -90,8 +90,8 @@ public class RemoteTerminal {
         try {
             scpClient.upload(Paths.get(localFile), remoteLocation);
         } catch (IOException e) {
-            log.error("Failed to upload file on remote!", e);
-            throw new GaswException("Failed to upload file on remote !");
+            log.error("Failed to upload file on remote!");
+            throw new GaswException("Failed to upload file on remote !", e);
         }
     }
 
@@ -102,12 +102,12 @@ public class RemoteTerminal {
         try {
             scpClient.download(remoteFile, Paths.get(localLocation));
         } catch (IOException e) {
-            log.error("Failed to download file on remote!", e);
-            throw new GaswException("Failed to download file on remote !");
+            log.error("Failed to download file on remote!");
+            throw new GaswException("Failed to download file on remote !", e);
         }
     }
 
-    private RemoteOutput executeCommand(final String command) {
+    private RemoteOutput executeCommand(final String command) throws GaswException {
         try (ByteArrayOutputStream stdout = new ByteArrayOutputStream();
                 ByteArrayOutputStream stderr = new ByteArrayOutputStream();
                 ChannelExec channel = session.createExecChannel(command)) {
@@ -121,11 +121,12 @@ public class RemoteTerminal {
             return new RemoteOutput(stdout.toString(), stderr.toString(), channel.getExitStatus());
         } catch (IOException e) {
             log.error("Failed to execute a command on remote!", e);
-            return null;
+            throw new GaswException("Failed to execute a commande on remote!", e);
         }
     }
 
-    public RemoteOutput oneCommand(final String command) {
+    
+    public RemoteOutput oneCommand(final String command) throws GaswException {
         final RemoteTerminal term = new RemoteTerminal(config);
         final RemoteOutput result;
 
@@ -137,7 +138,7 @@ public class RemoteTerminal {
             return result;
         } catch (GaswException e) {
             log.error("Failed to execute oneCommand !");
-            return null;
+            throw new GaswException("Failed to execute oneCommand !", e);
         }
     }
 }

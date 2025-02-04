@@ -2,7 +2,6 @@ package fr.insalyon.creatis.gasw.executor.batch;
 
 import java.util.stream.Collectors;
 
-import fr.insalyon.creatis.gasw.GaswConstants;
 import fr.insalyon.creatis.gasw.GaswException;
 import fr.insalyon.creatis.gasw.GaswInput;
 import fr.insalyon.creatis.gasw.execution.GaswSubmit;
@@ -28,8 +27,8 @@ public class BatchSubmit extends GaswSubmit {
         final String jobID = scriptName.substring(0, scriptName.lastIndexOf("."));
         final String params = gaswInput.getParameters().stream().collect(Collectors.joining(" "));
 
-        monitor.add(jobID, gaswInput.getExecutableName(), jobID, params.toString());
-        manager.submitter(jobID, "bash " + GaswConstants.SCRIPT_ROOT + "/" + scriptName);
+        monitor.add(jobID, gaswInput.getExecutableName(), jobID, params);
+        manager.submitJob(jobID, scriptName);
 
         if (!monitor.isAlive()) {
             monitor.start();

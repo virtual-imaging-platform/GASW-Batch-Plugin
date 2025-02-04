@@ -17,7 +17,6 @@ import fr.insalyon.creatis.gasw.executor.batch.config.json.properties.BatchConfi
 import fr.insalyon.creatis.gasw.executor.batch.internals.commands.RemoteCommand;
 import fr.insalyon.creatis.gasw.executor.batch.internals.commands.items.Mkdir;
 import fr.insalyon.creatis.gasw.executor.batch.internals.commands.items.Rm;
-import fr.insalyon.creatis.gasw.executor.batch.internals.terminal.RemoteFile;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j;
@@ -58,9 +57,9 @@ public class BatchManager {
         final List<RemoteCommand> commands = new ArrayList<>();
 
         commands.add(new Mkdir(getWorkingDir(), ""));
-        commands.add(new Mkdir(getWorkingDir() + "/out", "-p"));
-        commands.add(new Mkdir(getWorkingDir() + "/err", "-p"));
-        commands.add(new Mkdir(getWorkingDir() + "/sh", "-p"));
+        commands.add(new Mkdir(getWorkingDir() + GaswConstants.OUT_ROOT, "-p"));
+        commands.add(new Mkdir(getWorkingDir() + GaswConstants.ERR_ROOT, "-p"));
+        commands.add(new Mkdir(getWorkingDir() + GaswConstants.SCRIPT_ROOT, "-p"));
 
         for (final RemoteCommand command : commands) {
             command.execute(config);
@@ -100,39 +99,16 @@ public class BatchManager {
         }
     }
 
-    private void submitter(final BatchJob exec) {
+    public void submitJob(final String jobID, final String scriptName) {
+        final BatchJobData jobData = new BatchJobData(jobID, config, workflowId, scriptName);
+
         if (end == null) {
             end = false;
             new Thread(this.new BatchRunner()).start();
         }
         synchronized (this) {
-            jobs.add(exec);
+            jobs.add(new BatchJob(jobData));
         }
-    }
-
-    public void submitter(final String jobID, final String command) {
-        final BatchJobData jobData = new BatchJobData(jobID, config);
-        final String wDirectoryJob = config.getCredentials().getWorkingDir() + workflowId + "/";
-        final List<RemoteFile> filesUpload = new ArrayList<>();
-        final List<RemoteFile> filesDownload = new ArrayList<>();
-
-        jobData.setWorkingDir(wDirectoryJob);
-        jobData.setCommand(command);
-
-        filesUpload.add(new RemoteFile("./inv/" + jobID + "-invocation.json", wDirectoryJob));
-        filesUpload.add(new RemoteFile("./config/" + jobID + "-configuration.sh", wDirectoryJob));
-        filesUpload.add(new RemoteFile("./sh/" + jobID + ".sh", wDirectoryJob + "/sh"));
-        filesUpload.add(new RemoteFile("./workflow.json", wDirectoryJob));
-
-        filesDownload.add(new RemoteFile(jobData.getStderrPath(), "./err/" + jobID + ".sh.err"));
-        filesDownload.add(new RemoteFile(jobData.getStdoutPath(), "./out/" + jobID + ".sh.out"));
-        filesDownload.add(new RemoteFile(wDirectoryJob + jobID + ".sh.provenance.json", "./" + jobID + ".sh.provenance.json"));
-        filesDownload.add(new RemoteFile(wDirectoryJob + jobID + ".batch", "./" + jobID + ".batch"));
-
-        jobData.setFilesDownload(filesDownload);
-        jobData.setFilesUpload(filesUpload);
-
-        submitter(new BatchJob(jobData));
     }
 
     public BatchJob getJob(final String jobID) {
@@ -145,7 +121,7 @@ public class BatchManager {
     public List<BatchJob> getUnfinishedJobs() {
         return jobs.stream()
                 .filter(job -> !job.isTerminated())
-                .collect(Collectors.toCollection(ArrayList::new));
+                .collect(Collectors.toList());
     }
 
     @NoArgsConstructor
@@ -173,14 +149,14 @@ public class BatchManager {
         }
 
         private void loop() throws InterruptedException, GaswException {
-            while (initialized != true) {
+            while ( ! initialized) {
                 sleep();
             }
-            while (end == false) {
+            while ( ! end) {
                 synchronized (this) {
-                    for (final BatchJob exec : getUnfinishedJobs()) {
-                        if (exec.getStatus() == GaswStatus.NOT_SUBMITTED) {
-                            exec.start();
+                    for (final BatchJob job : getUnfinishedJobs()) {
+                        if (job.getStatus() == GaswStatus.NOT_SUBMITTED) {
+                            job.submit();
                         }
                     }
                 }

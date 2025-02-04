@@ -26,7 +26,7 @@ public class BatchOptions {
 
     /* By default the system uses slurm */
     @JsonProperty(value = "batchEngine")
-    private BatchEngines batchEngine = BatchEngines.SLURM;
+    private BatchEngine batchEngine = BatchEngine.SLURM;
 
     @JsonProperty("timeToBeReadyInSeconds")
     private int timeToBeReady = 120;

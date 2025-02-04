@@ -1,13 +1,11 @@
 package fr.insalyon.creatis.gasw.executor.batch.internals;
 
-import fr.insalyon.creatis.gasw.Gasw;
 import fr.insalyon.creatis.gasw.GaswException;
 import fr.insalyon.creatis.gasw.execution.GaswStatus;
-import fr.insalyon.creatis.gasw.executor.batch.config.json.properties.BatchEngines;
+import fr.insalyon.creatis.gasw.executor.batch.config.json.properties.BatchEngine;
 import fr.insalyon.creatis.gasw.executor.batch.internals.commands.RemoteCommand;
 import fr.insalyon.creatis.gasw.executor.batch.internals.commands.items.Cat;
 import fr.insalyon.creatis.gasw.executor.batch.internals.terminal.RemoteFile;
-import fr.insalyon.creatis.gasw.executor.batch.internals.terminal.RemoteOutput;
 import fr.insalyon.creatis.gasw.executor.batch.internals.terminal.RemoteTerminal;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -26,18 +24,6 @@ public class BatchJob {
     private boolean     terminated = false;
     private GaswStatus  status = GaswStatus.NOT_SUBMITTED;
 
-    private void createBatchFile() throws GaswException {
-        final BatchFile batchFile = new BatchFile(data);
-        final RemoteOutput output;
-
-        output = new RemoteTerminal(data.getConfig()).oneCommand("echo -en '" + batchFile.build() + "' > "
-                + data.getBatchFile());
-
-        if (output == null || output.getExitCode() != 0 || ! output.getStderr().getContent().isEmpty()) {
-            throw new GaswException("Impossible to create the batch file");
-        }
-    }
-
     /**
      * Upload all the data to the job directory.
      * 
@@ -45,10 +31,11 @@ public class BatchJob {
      */
     public void prepare() throws GaswException {
         final RemoteTerminal rt = new RemoteTerminal(data.getConfig());
+        new BatchFileBuilder(data).build();
 
         rt.connect();
         for (final RemoteFile file : data.getFilesUpload()) {
-            log.info("Uploading file : " + file.getSource());
+            log.info("Uploading file from " + file.getSource() + " to " + file.getDest());
             rt.upload(file.getSource(), file.getDest());
         }
         rt.disconnect();
@@ -62,15 +49,15 @@ public class BatchJob {
 
         rt.connect();
         for (final RemoteFile file : data.getFilesDownload()) {
-            log.info("Downloading file : " + file.getSource());
+            log.info("Downloading file from " + file.getSource() + " to " + file.getDest());
             rt.download(file.getSource(), file.getDest());
         }
         rt.disconnect();
     }
 
-    public void submit() throws GaswException {
-        final BatchEngines engine = data.getEngine();
-        final RemoteCommand command = engine.getSubmit(data.getBatchFile());
+    public void submitToCluster() throws GaswException {
+        final BatchEngine engine = data.getEngine();
+        final RemoteCommand command = engine.getSubmitCommand(data.getRemoteBatchFile());
 
         try {
             command.execute(data.getConfig());
@@ -87,10 +74,9 @@ public class BatchJob {
         }
     }
 
-    public void start() throws GaswException {
+    public void submit() throws GaswException {
         prepare();
-        createBatchFile();
-        submit();
+        submitToCluster();
         setStatus(GaswStatus.SUCCESSFULLY_SUBMITTED);
     }
 
@@ -123,8 +109,8 @@ public class BatchJob {
     }
 
     private GaswStatus getStatusRequest() {
-        final BatchEngines engine = data.getEngine();
-        final RemoteCommand command = engine.getStatus(data.getBatchJobID());
+        final BatchEngine engine = data.getEngine();
+        final RemoteCommand command = engine.getStatusCommand(data.getBatchJobID());
         final String result;
 
         try {
@@ -159,7 +145,7 @@ public class BatchJob {
         }
     }
 
-    public GaswStatus getStatus() {
+    public GaswStatus getStatus() throws InterruptedException {
         GaswStatus rawStatus;
 
         if (status == GaswStatus.NOT_SUBMITTED || status == GaswStatus.UNDEFINED || status == GaswStatus.STALLED) {
@@ -171,12 +157,7 @@ public class BatchJob {
             if (rawStatus != GaswStatus.UNDEFINED) {
                 return rawStatus;
             } else {
-                try {
-                    Thread.sleep(data.getConfig().getOptions().getStatusRetryWait());
-                } catch (InterruptedException e) {
-                    log.trace("Interrupted exception, exiting!", e);
-                    System.exit(1);
-                }
+                Thread.sleep(data.getConfig().getOptions().getStatusRetryWait());
             }
         }
         return GaswStatus.STALLED;
