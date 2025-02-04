@@ -156,7 +156,12 @@ public class BatchManager {
                 synchronized (this) {
                     for (final BatchJob job : getUnfinishedJobs()) {
                         if (job.getStatus() == GaswStatus.NOT_SUBMITTED) {
-                            job.submit();
+                            try {
+                                job.submit();
+                            } catch (GaswException e) {
+                                log.error("Failed to submit the job !", e);
+                                job.setStatus(GaswStatus.ERROR);
+                            }
                         }
                     }
                 }
