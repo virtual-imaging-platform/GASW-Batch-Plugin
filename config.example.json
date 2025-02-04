@@ -1,0 +1,17 @@
+{
+    "credentials": {
+        "host": "1.2.3.4",
+        "port": 22,
+        "username": "superuser",
+        "privateKeyPath": "/mykeys/ssh_private_key",
+        "workingDir": "mega-working-dir/"
+    },
+    "options": {
+        "commandExecutionTimeoutInMillis": 10,
+        "sshEventTimeoutInMillis": 1000,
+        "statusRetry": 10,
+        "statusRetryWaitInMillis": 1000,
+        "timeBeReadyInSeconds": 120,
+        "batchEngine": [PBS/SLURM]
+    }
+}
