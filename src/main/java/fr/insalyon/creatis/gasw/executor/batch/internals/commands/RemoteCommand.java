@@ -23,7 +23,7 @@ public abstract class RemoteCommand {
 
     public boolean failed() {
         if (output != null) {
-            return (output.getExitCode() != 0);
+            return (output == null || output.getExitCode() != 0);
         } else {
             return true;
         }
