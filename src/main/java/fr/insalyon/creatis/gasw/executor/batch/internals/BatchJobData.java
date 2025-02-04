@@ -67,10 +67,6 @@ public class BatchJobData {
         filesDownload.add(new RemoteFile(
             workingDir + jobID + ".sh.provenance.json", 
             "./" + jobID + ".sh.provenance.json"));
-
-        filesDownload.add(new RemoteFile(
-            getRemoteBatchFile(), 
-            getLocalBatchFile()));
     }
 
     public String getExitCodePath() {
