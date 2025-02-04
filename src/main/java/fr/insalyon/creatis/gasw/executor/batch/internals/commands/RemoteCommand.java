@@ -22,11 +22,7 @@ public abstract class RemoteCommand {
     }
 
     public boolean failed() {
-        if (output != null) {
-            return (output == null || output.getExitCode() != 0);
-        } else {
-            return true;
-        }
+        return output == null || output.getExitCode() != 0;
     }
 
     public abstract String result();
