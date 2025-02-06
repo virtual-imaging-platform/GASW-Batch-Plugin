@@ -123,7 +123,7 @@ public class BatchJob {
             return convertStatus(result);
 
         } catch (GaswException e) {
-            log.error("Failed to retrieve job status !");
+            log.error("Failed to retrieve job status !", e);
             return GaswStatus.UNDEFINED;
         }
     }
@@ -140,7 +140,7 @@ public class BatchJob {
             return Integer.parseInt(command.result().trim());
 
         } catch (GaswException e) {
-            log.error("Can't retrieve exitcode " + e.getMessage());
+            log.error("Can't retrieve exitcode !", e);
             return 1;
         }
     }

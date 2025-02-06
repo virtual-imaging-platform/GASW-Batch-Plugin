@@ -30,7 +30,7 @@ public class BatchSubmit extends GaswSubmit {
         monitor.add(jobID, gaswInput.getExecutableName(), jobID, params);
         manager.submitJob(jobID, scriptName);
 
-        if (!monitor.isAlive()) {
+        if ( ! monitor.isAlive()) {
             monitor.start();
         }
         return jobID;

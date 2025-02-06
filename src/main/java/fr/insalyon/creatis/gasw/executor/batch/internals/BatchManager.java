@@ -36,7 +36,7 @@ public class BatchManager {
     public BatchManager(final String workflowId, final BatchConfig config) {
         this.workflowId = workflowId;
         this.config = config;
-        this.workingDir = config.getCredentials().getWorkingDir() + workflowId;
+        this.workingDir = config.getCredentials().getWorkingDir() + workflowId + "/";
     }
 
     public void init() {
@@ -46,7 +46,7 @@ public class BatchManager {
 
             initialized = true;
         } catch (GaswException e) {
-            log.error("Failed to init the batch manager !");
+            log.error("Failed to init the batch manager !", e);
         }
     }
 
@@ -56,7 +56,7 @@ public class BatchManager {
     public void checkRemoteDirs() throws GaswException {
         final List<RemoteCommand> commands = new ArrayList<>();
 
-        commands.add(new Mkdir(getWorkingDir(), ""));
+        commands.add(new Mkdir(getWorkingDir(), "-p"));
         commands.add(new Mkdir(getWorkingDir() + GaswConstants.OUT_ROOT, "-p"));
         commands.add(new Mkdir(getWorkingDir() + GaswConstants.ERR_ROOT, "-p"));
         commands.add(new Mkdir(getWorkingDir() + GaswConstants.SCRIPT_ROOT, "-p"));
@@ -95,7 +95,7 @@ public class BatchManager {
                 log.warn("Failed to execute the remote command: " + remoteCommand.getCommand());
             }
         } catch (GaswException e) {
-            log.error("Failed to destroy the batch manager !");
+            log.error("Failed to destroy the batch manager !", e);
         }
     }
 
@@ -134,7 +134,7 @@ public class BatchManager {
                 startedTime = DateTime.now();
                 loop();
             } catch (GaswException | InterruptedException e) {
-                log.error("Somehing bad happened during the K8sRunner", e);
+                log.error("Somehing bad happened during the BatchRunner", e);
             }
         }
 
