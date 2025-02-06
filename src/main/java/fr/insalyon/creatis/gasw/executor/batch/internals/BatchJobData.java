@@ -1,5 +1,6 @@
 package fr.insalyon.creatis.gasw.executor.batch.internals;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import fr.insalyon.creatis.gasw.GaswConstants;
@@ -28,6 +29,8 @@ public class BatchJobData {
         this.jobID = jobID;
         this.config = config;
         this.scriptName = scriptName;
+        this.filesDownload = new ArrayList<>();
+        this.filesUpload = new ArrayList<>();
 
         defineDownloads();
         defineUploads();
@@ -58,11 +61,11 @@ public class BatchJobData {
     private void defineDownloads() {
         filesDownload.add(new RemoteFile(
             getStderrPath(), 
-            GaswConstants.ERR_ROOT + "/" + jobID + ".sh.err"));
+            "err/" + jobID + ".sh.err"));
 
         filesDownload.add(new RemoteFile(
             getStdoutPath(), 
-            GaswConstants.OUT_ROOT + "/" + jobID + ".sh.out"));
+            "out/" + jobID + ".sh.out"));
 
         filesDownload.add(new RemoteFile(
             workingDir + jobID + ".sh.provenance.json", 
@@ -74,11 +77,11 @@ public class BatchJobData {
     }
 
     public String getStdoutPath() {
-        return getWorkingDir() + GaswConstants.OUT_ROOT + "/" + getJobID() + GaswConstants.OUT_EXT;
+        return getWorkingDir() + "out/" + getJobID() + GaswConstants.OUT_EXT;
     }
 
     public String getStderrPath() {
-        return getWorkingDir() + GaswConstants.ERR_ROOT + "/" + getJobID() + GaswConstants.ERR_EXT;
+        return getWorkingDir() + "err/" + getJobID() + GaswConstants.ERR_EXT;
     }
 
     public String getRemoteBatchFile() {
