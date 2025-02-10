@@ -12,6 +12,7 @@
         "statusRetry": 10,
         "statusRetryWaitInMillis": 1000,
         "timeToBeReadyInSeconds": 120,
-        "batchEngine": [PBS/SLURM]
+        "batchEngine": [PBS/SLURM],
+        "customPreJobCommands": []
     }
 }

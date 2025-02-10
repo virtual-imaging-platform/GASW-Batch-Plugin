@@ -28,6 +28,7 @@ It is called from the *engine motor* and then utilised in completition of [GASW]
 ### Prerequisite
 To run this plugin you need to use at least **Java 21** runtime environnement.  
 You should also provide **config.json** file which contains the information about the plugin it self (the location shall be *./conf/conf_batch.conf*).  
+This plugin only support **RSA keys**.  
 
 ### Working
 To deal with PBS and Slurm we use an SSH connection which replaces the API of the Kubernetes plugin for example.  

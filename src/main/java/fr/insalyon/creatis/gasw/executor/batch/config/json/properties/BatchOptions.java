@@ -1,5 +1,8 @@
 package fr.insalyon.creatis.gasw.executor.batch.config.json.properties;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Getter;
@@ -30,4 +33,7 @@ public class BatchOptions {
 
     @JsonProperty("timeToBeReadyInSeconds")
     private int timeToBeReady = 120;
+
+    @JsonProperty("customPreJobCommands")
+    private List<String> customPreJobCommands = new ArrayList<>();
 }
