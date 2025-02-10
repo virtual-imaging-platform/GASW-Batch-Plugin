@@ -11,7 +11,7 @@
         "sshEventTimeoutInMillis": 1000,
         "statusRetry": 10,
         "statusRetryWaitInMillis": 1000,
-        "timeBeReadyInSeconds": 120,
+        "timeToBeReadyInSeconds": 120,
         "batchEngine": [PBS/SLURM],
         "customPreJobCommands": []
     }
