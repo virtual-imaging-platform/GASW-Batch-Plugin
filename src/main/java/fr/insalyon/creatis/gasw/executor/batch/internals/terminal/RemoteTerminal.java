@@ -41,7 +41,10 @@ public class RemoteTerminal {
         this.cred = config.getCredentials();
     }
 
-    private void init() throws GaswException {
+    /**
+     * This method is called inside connect(), should not be directly called outside of test context
+     */
+    public void init() throws GaswException {
         try {
             final KeyPairResourceLoader loader = SecurityUtils.getKeyPairResourceParser();
             final Collection<KeyPair> keys = loader.loadKeyPairs(null, Paths.get(cred.getPrivateKeyPath()), null);
