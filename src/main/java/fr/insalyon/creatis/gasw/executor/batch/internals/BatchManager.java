@@ -60,6 +60,8 @@ public class BatchManager {
         commands.add(new Mkdir(getWorkingDir() + GaswConstants.OUT_ROOT, "-p"));
         commands.add(new Mkdir(getWorkingDir() + GaswConstants.ERR_ROOT, "-p"));
         commands.add(new Mkdir(getWorkingDir() + GaswConstants.SCRIPT_ROOT, "-p"));
+        commands.add(new Mkdir(getWorkingDir() + GaswConstants.INVOCATION_DIR, "-p"));
+        commands.add(new Mkdir(getWorkingDir() + GaswConstants.CONFIG_DIR, "-p"));
 
         for (final RemoteCommand command : commands) {
             command.execute(config);
