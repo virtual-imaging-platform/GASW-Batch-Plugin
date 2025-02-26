@@ -39,11 +39,11 @@ public class BatchJobData {
     private void defineUploads() {
         filesUpload.add(new RemoteFile(
             GaswConstants.INVOCATION_DIR + "/" + jobID + "-invocation.json", 
-            workingDir));
+            workingDir + "/inv"));
 
         filesUpload.add(new RemoteFile(
             GaswConstants.CONFIG_DIR + "/" + jobID + "-configuration.sh", 
-            workingDir));
+            workingDir + "/config"));
 
         filesUpload.add(new RemoteFile(
             GaswConstants.SCRIPT_ROOT + "/" + jobID + ".sh", 
