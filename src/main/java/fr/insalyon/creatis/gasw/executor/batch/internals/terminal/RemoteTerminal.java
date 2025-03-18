@@ -119,7 +119,7 @@ public class RemoteTerminal {
             channel.setErr(stderr);
 
             channel.open().verify(config.getOptions().getCommandExecutionTimeout(), TimeUnit.SECONDS);
-            channel.waitFor(EnumSet.of(ClientChannelEvent.CLOSED), config.getOptions().getSshEventTimeout());
+            channel.waitFor(EnumSet.of(ClientChannelEvent.CLOSED, ClientChannelEvent.EXIT_STATUS), config.getOptions().getSshEventTimeout());
 
             return new RemoteOutput(stdout.toString(), stderr.toString(), channel.getExitStatus());
         } catch (IOException e) {
