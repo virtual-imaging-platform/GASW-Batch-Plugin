@@ -11,6 +11,7 @@ import fr.insalyon.creatis.gasw.execution.GaswStatus;
 import fr.insalyon.creatis.gasw.executor.batch.config.Constants;
 import fr.insalyon.creatis.gasw.executor.batch.internals.BatchJob;
 import fr.insalyon.creatis.gasw.executor.batch.internals.BatchManager;
+import fr.insalyon.creatis.gasw.executor.batch.internals.commands.RemoteCommand;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j;
@@ -102,7 +103,22 @@ final public class BatchMonitor extends GaswMonitor {
     }
 
     @Override
-    protected void kill(Job job) {}
+    protected void kill(Job job) {
+        final BatchJob batchJob = manager.getJob(job.getId());
+
+        if (batchJob != null) {
+            RemoteCommand command = batchJob.getData().getEngine().getDeleteCommand(batchJob.getData().getBatchJobID());
+
+            try {
+                command.execute(batchJob.getData().getConfig());
+                log.info("Job" + job.getId() + " successfully killed!");;
+            } catch (GaswException e) {
+                log.warn("Failed to kill job " + job.getId());
+            }
+        } else {
+            log.warn("Job " + job.getId() + " do not exist anymore!");
+        }
+    }
 
     @Override
     protected void reschedule(Job job) {}
