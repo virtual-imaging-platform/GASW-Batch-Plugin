@@ -38,7 +38,8 @@ final public class BatchMonitor extends GaswMonitor {
 
     @Override
     public void run() {
-        while (!stop) {
+        while ( ! stop) {
+            verifySignaledJobs();
             try {
                 for (final BatchJob job : manager.getUnfinishedJobs()) {
                     final Job daoJob = jobDAO.getJobByID(job.getData().getJobID());
