@@ -58,8 +58,15 @@ public class BatchExecutor implements ExecutorPlugin {
 
     @Override
     public void terminate() throws GaswException {
-        manager.destroy();
-        // Gasw
-        monitor.finish();
+        try {
+            manager.stopRunner();
+
+            monitor.interrupt();
+            monitor.join();
+
+            manager.clean();
+        } catch (InterruptedException e) {
+            log.warn("Hard-kill occured!");
+        }
     }
 }

@@ -22,11 +22,9 @@ final public class BatchMonitor extends GaswMonitor {
     @Getter
     @Setter
     private BatchManager    manager;
-    private boolean         stop;
 
     public BatchMonitor() {
         super();
-        stop = false;
     }
 
     private boolean notRunningJob(GaswStatus s) {
@@ -38,7 +36,7 @@ final public class BatchMonitor extends GaswMonitor {
 
     @Override
     public void run() {
-        while ( ! stop) {
+        while (true) {
             verifySignaledJobs();
             try {
                 for (final BatchJob job : manager.getUnfinishedJobs()) {
@@ -84,8 +82,16 @@ final public class BatchMonitor extends GaswMonitor {
     }
 
     public synchronized void finish() {
-        log.trace("Monitor is off !");
-        stop = true;
+        log.info("Monitor is off !");
+
+        // kill jobs that are still running (context of soft-kill)
+        try {
+            for (Job job : jobDAO.getActiveJobs()) {
+                kill(job);
+            }
+        } catch (DAOException e) {
+            log.warn("Failed to kill the running jobs before terminating!", e);
+        }
     }
 
     public void updateJob(final Job job, final GaswStatus status) {
@@ -99,7 +105,7 @@ final public class BatchMonitor extends GaswMonitor {
                 jobDAO.update(job);
             }
         } catch (DAOException e) {
-            log.error(e);
+            log.error("Error updating job status! " + job.getId(), e);
         }
     }
 
@@ -112,7 +118,10 @@ final public class BatchMonitor extends GaswMonitor {
 
             try {
                 command.execute(batchJob.getData().getConfig());
-                log.info("Job" + job.getId() + " successfully killed!");;
+                log.info("Job" + job.getId() + " successfully killed!");
+
+                updateJob(job, GaswStatus.DELETED);
+
             } catch (GaswException e) {
                 log.warn("Failed to kill job " + job.getId());
             }
