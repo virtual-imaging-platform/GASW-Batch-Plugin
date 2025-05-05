@@ -66,6 +66,7 @@ final public class BatchMonitor extends GaswMonitor {
             } catch (InterruptedException ex) {
                 log.error("Interrupted exception, stopping the worker!");
                 finish();
+                break;
             }
         }
     }
