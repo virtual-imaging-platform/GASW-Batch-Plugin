@@ -31,7 +31,7 @@ public class BatchManager {
     final private List<BatchJob>    jobs = new ArrayList<>();
 
     private boolean initialized = false;
-    private Boolean end;
+    private BatchRunner runner;
 
     public BatchManager(final String workflowId, final BatchConfig config) {
         this.workflowId = workflowId;
@@ -85,13 +85,16 @@ public class BatchManager {
                 });
     }
 
-    /**
-     * Clean files created inside the workflow folder
-     */
-    public void destroy() {
-        final RemoteCommand remoteCommand = new Rm(config.getCredentials().getWorkingDir() + workflowId, "-rf");
+    public void stopRunner() throws InterruptedException {
+        if (runner != null) {
+            runner.interrupt();
+            runner.join();
+        }
+    }
 
-        end = true;
+    public void clean() {
+        final RemoteCommand remoteCommand = new Rm(config.getCredentials().getWorkingDir() + workflowId, "-rf");
+    
         try {
             if (remoteCommand.execute(config).failed()) {
                 log.warn("Failed to execute the remote command: " + remoteCommand.getCommand());
@@ -104,9 +107,9 @@ public class BatchManager {
     public void submitJob(final String jobID, final String scriptName) {
         final BatchJobData jobData = new BatchJobData(jobID, config, workflowId, scriptName);
 
-        if (end == null) {
-            end = false;
-            new Thread(this.new BatchRunner()).start();
+        if (runner == null) {
+            runner = new BatchRunner();
+            runner.start();
         }
         synchronized (this) {
             jobs.add(new BatchJob(jobData));
@@ -127,7 +130,7 @@ public class BatchManager {
     }
 
     @NoArgsConstructor
-    class BatchRunner implements Runnable {
+    class BatchRunner extends Thread {
         private DateTime startedTime;
 
         @Override
@@ -135,8 +138,10 @@ public class BatchManager {
             try {
                 startedTime = DateTime.now();
                 loop();
-            } catch (GaswException | InterruptedException e) {
-                log.error("Somehing bad happened during the BatchRunner", e);
+            } catch (GaswException e) {
+                log.error("Something bad happened during the BatchRunner", e);
+            } catch (InterruptedException e) {
+                log.warn("InterruptedException, a soft/hard-kill may occur!");
             }
         }
 
@@ -154,7 +159,7 @@ public class BatchManager {
             while ( ! initialized) {
                 sleep();
             }
-            while ( ! end) {
+            while (true) {
                 synchronized (this) {
                     for (final BatchJob job : getUnfinishedJobs()) {
                         if (job.getStatus() == GaswStatus.NOT_SUBMITTED) {

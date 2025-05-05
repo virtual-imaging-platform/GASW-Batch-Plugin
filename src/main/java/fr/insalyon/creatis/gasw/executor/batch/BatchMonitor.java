@@ -11,6 +11,7 @@ import fr.insalyon.creatis.gasw.execution.GaswStatus;
 import fr.insalyon.creatis.gasw.executor.batch.config.Constants;
 import fr.insalyon.creatis.gasw.executor.batch.internals.BatchJob;
 import fr.insalyon.creatis.gasw.executor.batch.internals.BatchManager;
+import fr.insalyon.creatis.gasw.executor.batch.internals.commands.RemoteCommand;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j;
@@ -21,11 +22,9 @@ final public class BatchMonitor extends GaswMonitor {
     @Getter
     @Setter
     private BatchManager    manager;
-    private boolean         stop;
 
     public BatchMonitor() {
         super();
-        stop = false;
     }
 
     private boolean notRunningJob(GaswStatus s) {
@@ -37,7 +36,8 @@ final public class BatchMonitor extends GaswMonitor {
 
     @Override
     public void run() {
-        while (!stop) {
+        while (true) {
+            verifySignaledJobs();
             try {
                 for (final BatchJob job : manager.getUnfinishedJobs()) {
                     final Job daoJob = jobDAO.getJobByID(job.getData().getJobID());
@@ -66,6 +66,7 @@ final public class BatchMonitor extends GaswMonitor {
             } catch (InterruptedException ex) {
                 log.error("Interrupted exception, stopping the worker!");
                 finish();
+                break;
             }
         }
     }
@@ -82,8 +83,16 @@ final public class BatchMonitor extends GaswMonitor {
     }
 
     public synchronized void finish() {
-        log.trace("Monitor is off !");
-        stop = true;
+        log.info("Monitor is off !");
+
+        // kill jobs that are still running (context of soft-kill)
+        try {
+            for (Job job : jobDAO.getActiveJobs()) {
+                kill(job);
+            }
+        } catch (DAOException e) {
+            log.warn("Failed to kill the running jobs before terminating!", e);
+        }
     }
 
     public void updateJob(final Job job, final GaswStatus status) {
@@ -97,12 +106,30 @@ final public class BatchMonitor extends GaswMonitor {
                 jobDAO.update(job);
             }
         } catch (DAOException e) {
-            log.error(e);
+            log.error("Error updating job status! " + job.getId(), e);
         }
     }
 
     @Override
-    protected void kill(Job job) {}
+    protected void kill(Job job) {
+        final BatchJob batchJob = manager.getJob(job.getId());
+
+        if (batchJob != null) {
+            RemoteCommand command = batchJob.getData().getEngine().getDeleteCommand(batchJob.getData().getBatchJobID());
+
+            try {
+                command.execute(batchJob.getData().getConfig());
+                log.info("Job" + job.getId() + " successfully killed!");
+
+                updateJob(job, GaswStatus.DELETED);
+
+            } catch (GaswException e) {
+                log.warn("Failed to kill job " + job.getId());
+            }
+        } else {
+            log.warn("Job " + job.getId() + " do not exist anymore!");
+        }
+    }
 
     @Override
     protected void reschedule(Job job) {}
