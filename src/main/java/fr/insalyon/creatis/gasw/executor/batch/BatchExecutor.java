@@ -58,6 +58,9 @@ public class BatchExecutor implements ExecutorPlugin {
 
     @Override
     public void terminate() throws GaswException {
+        if ( ! loaded) {
+            return;
+        }
         try {
             manager.stopRunner();
 
