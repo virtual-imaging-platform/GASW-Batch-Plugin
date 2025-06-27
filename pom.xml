@@ -1,0 +1,137 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>fr.insalyon.creatis</groupId>
+    <artifactId>gasw-batch-plugin</artifactId>
+    <version>1.0</version>
+    <packaging>jar</packaging>
+
+    <name>GASW-Batch-Plugin</name>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <gasw-version>4.0</gasw-version>
+    </properties>
+
+    <licenses>
+        <license>
+            <name>CeCILL-B, Version 1.0</name>
+            <url>http://www.cecill.info/</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <organization>
+        <name>CREATIS</name>
+        <url>http://www.creatis.insa-lyon.fr/</url>
+    </organization>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>fr.insalyon.creatis.gasw.Gasw</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.2</version>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>2.13.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.17.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.sshd</groupId>
+            <artifactId>sshd-scp</artifactId>
+            <version>2.13.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.sshd</groupId>
+            <artifactId>sshd-core</artifactId>
+            <version>2.13.2</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>gasw</artifactId>
+            <version>${gasw-version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.34</version>
+        </dependency>
+        <dependency>
+            <groupId>net.i2p.crypto</groupId>
+            <artifactId>eddsa</artifactId>
+            <version>0.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>5.13.0</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <repositories>
+        <repository>
+            <id>creatis</id>
+            <name>Creatis Insa Lyon repository [creatis]</name>
+            <url>https://vip.creatis.insa-lyon.fr:9007/nexus/repository/public</url>
+        </repository>
+    </repositories>
+
+    <distributionManagement>
+        <repository>
+            <id>creatis-releases</id>
+            <name>Internal Releases</name>
+            <url>https://vip.creatis.insa-lyon.fr:9007/nexus/repository/releases</url>
+        </repository>
+
+        <snapshotRepository>
+            <id>creatis-snapshots</id>
+            <name>Internal Snapshots</name>
+            <url>https://vip.creatis.insa-lyon.fr:9007/nexus/repository/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+</project>
