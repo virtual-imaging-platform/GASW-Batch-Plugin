@@ -19,6 +19,7 @@ import fr.insalyon.creatis.gasw.executor.batch.internals.commands.items.Mkdir;
 import fr.insalyon.creatis.gasw.executor.batch.internals.commands.items.Rm;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.extern.log4j.Log4j;
 
 @Getter
@@ -85,9 +86,13 @@ public class BatchManager {
                 });
     }
 
-    public void stopRunner() throws InterruptedException {
+    public synchronized void stopRunner(boolean force) throws InterruptedException {
         if (runner != null) {
-            runner.interrupt();
+            if (force) {
+                runner.interrupt();
+            } else {
+                runner.setStop(true);
+            }
             runner.join();
         }
     }
@@ -132,6 +137,8 @@ public class BatchManager {
     @NoArgsConstructor
     class BatchRunner extends Thread {
         private DateTime startedTime;
+        @Setter
+        private boolean stop = false;
 
         @Override
         public void run() {
@@ -159,7 +166,7 @@ public class BatchManager {
             while ( ! initialized) {
                 sleep();
             }
-            while (true) {
+            while ( ! stop) {
                 synchronized (this) {
                     for (final BatchJob job : getUnfinishedJobs()) {
                         if (job.getStatus() == GaswStatus.NOT_SUBMITTED) {
