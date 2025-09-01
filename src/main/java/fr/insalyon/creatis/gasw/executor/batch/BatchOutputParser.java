@@ -9,9 +9,9 @@ import fr.insalyon.creatis.gasw.GaswOutput;
 import fr.insalyon.creatis.gasw.execution.GaswOutputParser;
 import fr.insalyon.creatis.gasw.execution.GaswStatus;
 import fr.insalyon.creatis.gasw.executor.batch.internals.BatchJob;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 
-@Log4j
+@Slf4j
 public class BatchOutputParser extends GaswOutputParser {
 
     final private BatchJob batchJob;

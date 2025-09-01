@@ -22,12 +22,12 @@ import org.apache.sshd.scp.client.ScpClientCreator;
 import fr.insalyon.creatis.gasw.GaswException;
 import fr.insalyon.creatis.gasw.executor.batch.config.json.properties.BatchConfig;
 import fr.insalyon.creatis.gasw.executor.batch.config.json.properties.BatchCredentials;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @see -RFC 4253
  */
-@Log4j
+@Slf4j
 public class RemoteTerminal {
 
     final private BatchConfig       config;
