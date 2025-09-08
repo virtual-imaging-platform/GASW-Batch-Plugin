@@ -160,6 +160,7 @@ public class BatchJob {
                 Thread.sleep(data.getConfig().getOptions().getStatusRetryWait());
             }
         }
+        log.warn("Max status retry reached for {}, the job status will defined as STALLED!", getData().getJobID());
         return GaswStatus.STALLED;
     }
 }
