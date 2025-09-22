@@ -57,15 +57,13 @@ public class BatchExecutor implements ExecutorPlugin {
     }
 
     @Override
-    public void terminate() throws GaswException {
+    public void terminate(boolean force) throws GaswException {
         if ( ! loaded) {
             return;
         }
         try {
-            manager.stopRunner();
-
-            monitor.interrupt();
-            monitor.join();
+            manager.stopRunner(force);
+            monitor.stopMonitor(force);
 
             manager.clean();
         } catch (InterruptedException e) {
