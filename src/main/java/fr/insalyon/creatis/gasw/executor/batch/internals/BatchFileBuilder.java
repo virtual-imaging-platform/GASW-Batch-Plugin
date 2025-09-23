@@ -7,10 +7,10 @@ import java.util.List;
 
 import fr.insalyon.creatis.gasw.GaswException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 
 @RequiredArgsConstructor
-@Log4j
+@Slf4j
 public class BatchFileBuilder {
 
     final private BatchJobData  data;

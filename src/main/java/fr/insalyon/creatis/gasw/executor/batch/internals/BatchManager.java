@@ -20,10 +20,10 @@ import fr.insalyon.creatis.gasw.executor.batch.internals.commands.items.Rm;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 
 @Getter
-@Log4j
+@Slf4j
 public class BatchManager {
 
     final private String            workflowId;
@@ -68,7 +68,7 @@ public class BatchManager {
             command.execute(config);
 
             if (command.failed()) {
-                log.error("Failed to create the remotes dirs: " + command.getCommand());
+                log.error("Failed to create the remotes dirs: {}", command.getCommand());
                 throw new GaswException("Failed to create the remotes dirs: " + command.getCommand());
             }
         }
@@ -102,7 +102,7 @@ public class BatchManager {
     
         try {
             if (remoteCommand.execute(config).failed()) {
-                log.warn("Failed to execute the remote command: " + remoteCommand.getCommand());
+                log.warn("Failed to execute the remote command: {}", remoteCommand.getCommand());
             }
         } catch (GaswException e) {
             log.error("Failed to destroy the batch manager !", e);

@@ -14,9 +14,9 @@ import fr.insalyon.creatis.gasw.executor.batch.internals.BatchManager;
 import fr.insalyon.creatis.gasw.executor.batch.internals.commands.RemoteCommand;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 
-@Log4j
+@Slf4j
 final public class BatchMonitor extends GaswMonitor {
 
     @Getter
@@ -81,7 +81,7 @@ final public class BatchMonitor extends GaswMonitor {
 
         job.setQueued(new Date());
         add(job);
-        log.info("Adding job: " + jobID);
+        log.info("Adding job: {}", jobID);
     }
 
     public synchronized void stopMonitor(boolean force) throws InterruptedException {
@@ -117,7 +117,7 @@ final public class BatchMonitor extends GaswMonitor {
                 jobDAO.update(job);
             }
         } catch (DAOException e) {
-            log.error("Error updating job status! " + job.getId(), e);
+            log.error("Error updating job {} status!", job.getId(), e);
         }
     }
 
@@ -130,15 +130,15 @@ final public class BatchMonitor extends GaswMonitor {
 
             try {
                 command.execute(batchJob.getData().getConfig());
-                log.info("Job" + job.getId() + " successfully killed!");
+                log.info("Job {} successfully killed!", job.getId());
 
                 updateJob(job, GaswStatus.DELETED);
 
             } catch (GaswException e) {
-                log.warn("Failed to kill job " + job.getId());
+                log.warn("Failed to kill job {}", job.getId());
             }
         } else {
-            log.warn("Job " + job.getId() + " do not exist anymore!");
+            log.warn("Job {} do not exist anymore!", job.getId());
         }
     }
 

@@ -10,9 +10,9 @@ import fr.insalyon.creatis.gasw.executor.batch.internals.terminal.RemoteTerminal
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 
-@Log4j
+@Slf4j
 @RequiredArgsConstructor
 @Setter
 public class BatchJob {
@@ -35,7 +35,7 @@ public class BatchJob {
 
         rt.connect();
         for (final RemoteFile file : data.getFilesUpload()) {
-            log.info("Uploading file from " + file.getSource() + " to " + file.getDest());
+            log.info("Uploading file from {} to {}", file.getSource(), file.getDest());
             rt.upload(file.getSource(), file.getDest());
         }
         rt.disconnect();
@@ -49,7 +49,7 @@ public class BatchJob {
 
         rt.connect();
         for (final RemoteFile file : data.getFilesDownload()) {
-            log.info("Downloading file from " + file.getSource() + " to " + file.getDest());
+            log.info("Downloading file from {} to {}", file.getSource(), file.getDest());
             rt.download(file.getSource(), file.getDest());
         }
         rt.disconnect();
@@ -66,10 +66,10 @@ public class BatchJob {
                 throw new GaswException("Command failed !");
             }
             data.setBatchJobID(command.result());
-            log.debug("Job ID inside the Cluster : " + command.result());
+            log.debug("Job ID inside the Cluster: {}", command.result());
 
         } catch (GaswException e) {
-            log.error("Failed to submit the job " + getData().getJobID());
+            log.error("Failed to submit the job {}", getData().getJobID());
             throw e;
         }
     }
@@ -160,6 +160,7 @@ public class BatchJob {
                 Thread.sleep(data.getConfig().getOptions().getStatusRetryWait());
             }
         }
+        log.warn("Max status retry reached for {}, the job status will defined as STALLED!", getData().getJobID());
         return GaswStatus.STALLED;
     }
 }

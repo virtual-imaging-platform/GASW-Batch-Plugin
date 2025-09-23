@@ -6,9 +6,9 @@ import java.io.IOException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.insalyon.creatis.gasw.executor.batch.config.json.properties.BatchConfig;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 
-@Log4j
+@Slf4j
 public class ConfigBuilder {
 
     final private String filePath;

@@ -9,9 +9,9 @@ import fr.insalyon.creatis.gasw.executor.batch.internals.commands.items.Sbatch;
 import fr.insalyon.creatis.gasw.executor.batch.internals.commands.items.Scancel;
 import fr.insalyon.creatis.gasw.executor.batch.internals.commands.items.Scontrol;
 import fr.insalyon.creatis.gasw.executor.batch.internals.commands.items.Tracejob;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 
-@Log4j
+@Slf4j
 public enum BatchEngine {
 
     SLURM(Sbatch.class, Scontrol.class, Scancel.class),

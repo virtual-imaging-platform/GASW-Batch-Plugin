@@ -12,12 +12,12 @@ import fr.insalyon.creatis.gasw.executor.batch.config.json.properties.BatchConfi
 import fr.insalyon.creatis.gasw.executor.batch.internals.BatchManager;
 import fr.insalyon.creatis.gasw.plugin.ExecutorPlugin;
 import lombok.NoArgsConstructor;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 @PluginImplementation
 @NoArgsConstructor
-@Log4j
+@Slf4j
 public class BatchExecutor implements ExecutorPlugin {
 
     private BatchManager    manager;
@@ -41,7 +41,7 @@ public class BatchExecutor implements ExecutorPlugin {
             monitor = new BatchMonitor();
             monitor.setManager(manager);
             loaded = true;
-            log.info("GASW-Batch-Plugin launched with " + config.getOptions().getBatchEngine());
+            log.info("GASW-Batch-Plugin launched with {}", config.getOptions().getBatchEngine());
         }
         submitter = new BatchSubmit(gaswInput, new BatchMinorStatusGenerator(), manager, monitor);
     }
