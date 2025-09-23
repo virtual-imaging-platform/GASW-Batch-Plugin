@@ -22,6 +22,8 @@ final public class BatchMonitor extends GaswMonitor {
     @Getter
     @Setter
     private BatchManager    manager;
+    @Setter
+    private boolean         stop = false;
 
     public BatchMonitor() {
         super();
@@ -36,7 +38,7 @@ final public class BatchMonitor extends GaswMonitor {
 
     @Override
     public void run() {
-        while (true) {
+        while ( ! stop) {
             verifySignaledJobs();
             try {
                 for (final BatchJob job : manager.getUnfinishedJobs()) {
@@ -80,6 +82,15 @@ final public class BatchMonitor extends GaswMonitor {
         job.setQueued(new Date());
         add(job);
         log.info("Adding job: {}", jobID);
+    }
+
+    public synchronized void stopMonitor(boolean force) throws InterruptedException {
+        if (force) {
+            interrupt();
+        } else {
+            setStop(true);
+        }
+        join();
     }
 
     public synchronized void finish() {
