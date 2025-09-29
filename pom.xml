@@ -5,7 +5,7 @@
 
     <groupId>fr.insalyon.creatis</groupId>
     <artifactId>gasw-batch-plugin</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.1</version>
     <packaging>jar</packaging>
 
     <name>GASW-Batch-Plugin</name>
@@ -14,7 +14,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
-        <gasw-version>4.2-SNAPSHOT</gasw-version>
+        <gasw-version>4.2</gasw-version>
     </properties>
 
     <licenses>
