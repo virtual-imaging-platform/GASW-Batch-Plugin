@@ -19,10 +19,11 @@ import fr.insalyon.creatis.gasw.executor.batch.internals.commands.items.Mkdir;
 import fr.insalyon.creatis.gasw.executor.batch.internals.commands.items.Rm;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.extern.log4j.Log4j;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 @Getter
-@Log4j
+@Slf4j
 public class BatchManager {
 
     final private String            workflowId;
@@ -67,7 +68,7 @@ public class BatchManager {
             command.execute(config);
 
             if (command.failed()) {
-                log.error("Failed to create the remotes dirs: " + command.getCommand());
+                log.error("Failed to create the remotes dirs: {}", command.getCommand());
                 throw new GaswException("Failed to create the remotes dirs: " + command.getCommand());
             }
         }
@@ -85,9 +86,13 @@ public class BatchManager {
                 });
     }
 
-    public void stopRunner() throws InterruptedException {
+    public synchronized void stopRunner(boolean force) throws InterruptedException {
         if (runner != null) {
-            runner.interrupt();
+            if (force) {
+                runner.interrupt();
+            } else {
+                runner.setStop(true);
+            }
             runner.join();
         }
     }
@@ -97,7 +102,7 @@ public class BatchManager {
     
         try {
             if (remoteCommand.execute(config).failed()) {
-                log.warn("Failed to execute the remote command: " + remoteCommand.getCommand());
+                log.warn("Failed to execute the remote command: {}", remoteCommand.getCommand());
             }
         } catch (GaswException e) {
             log.error("Failed to destroy the batch manager !", e);
@@ -132,6 +137,8 @@ public class BatchManager {
     @NoArgsConstructor
     class BatchRunner extends Thread {
         private DateTime startedTime;
+        @Setter
+        private boolean stop = false;
 
         @Override
         public void run() {
@@ -159,7 +166,7 @@ public class BatchManager {
             while ( ! initialized) {
                 sleep();
             }
-            while (true) {
+            while ( ! stop) {
                 synchronized (this) {
                     for (final BatchJob job : getUnfinishedJobs()) {
                         if (job.getStatus() == GaswStatus.NOT_SUBMITTED) {

@@ -6,9 +6,7 @@ import fr.insalyon.creatis.gasw.GaswException;
 import fr.insalyon.creatis.gasw.GaswInput;
 import fr.insalyon.creatis.gasw.execution.GaswSubmit;
 import fr.insalyon.creatis.gasw.executor.batch.internals.BatchManager;
-import lombok.extern.log4j.Log4j;
 
-@Log4j
 public class BatchSubmit extends GaswSubmit {
 
     final private BatchManager manager;
