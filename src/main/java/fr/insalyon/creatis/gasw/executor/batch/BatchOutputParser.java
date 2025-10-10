@@ -34,26 +34,7 @@ public class BatchOutputParser extends GaswOutputParser {
         if (job.getStatus() != GaswStatus.DELETED) {
             exitCode = parseStdOut(stdOut);
             exitCode = parseStdErr(stdErr, exitCode);
-
-            switch (exitCode) {
-                case 0:
-                    gaswExitCode = GaswExitCode.SUCCESS;
-                    break;
-                case 1:
-                    gaswExitCode = GaswExitCode.ERROR_READ_GRID;
-                    break;
-                case 2:
-                    gaswExitCode = GaswExitCode.ERROR_WRITE_GRID;
-                    break;
-                case 6:
-                    gaswExitCode = GaswExitCode.EXECUTION_FAILED;
-                    break;
-                case 7:
-                    gaswExitCode = GaswExitCode.ERROR_WRITE_LOCAL;
-                    break;
-                default:
-                    gaswExitCode = GaswExitCode.UNDEFINED;
-            }
+            gaswExitCode = GaswExitCode.fromExitCode(exitCode);
         } else {
             gaswExitCode = GaswExitCode.EXECUTION_CANCELED;
         }
