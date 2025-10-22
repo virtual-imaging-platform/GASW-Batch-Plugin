@@ -133,6 +133,7 @@ final public class BatchMonitor extends GaswMonitor {
                 log.info("Job {} successfully killed!", job.getId());
 
                 updateJob(job, GaswStatus.DELETED);
+                new BatchOutputParser(batchJob).start();
 
             } catch (GaswException e) {
                 log.warn("Failed to kill job {}", job.getId());

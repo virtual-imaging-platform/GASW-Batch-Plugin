@@ -37,6 +37,7 @@ public class BatchOutputParser extends GaswOutputParser {
             gaswExitCode = GaswExitCode.fromExitCode(exitCode);
         } else {
             gaswExitCode = GaswExitCode.EXECUTION_CANCELED;
+            parseNonStdOut(GaswExitCode.EXECUTION_CANCELED.getExitCode());
         }
 
         return new GaswOutput(job.getId(), gaswExitCode, "", uploadedResults,
