@@ -70,6 +70,10 @@ public class BatchJobData {
         filesDownload.add(new RemoteFile(
             workingDir + jobID + ".sh.provenance.json", 
             "./" + jobID + ".sh.provenance.json"));
+
+        filesDownload.add(new RemoteFile(
+            getMetricsPath(), 
+            "out/" + jobID + ".slurm.metrics"));
     }
 
     public String getExitCodePath() {
@@ -82,6 +86,10 @@ public class BatchJobData {
 
     public String getStderrPath() {
         return getWorkingDir() + "err/" + getJobID() + GaswConstants.ERR_EXT;
+    }
+
+    public String getMetricsPath() {
+        return getWorkingDir() + "out/" + getJobID() + ".slurm.metrics";
     }
 
     public String getRemoteBatchFile() {
