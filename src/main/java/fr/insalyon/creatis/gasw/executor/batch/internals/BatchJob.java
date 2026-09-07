@@ -39,7 +39,6 @@ public class BatchJob {
         for (final RemoteFile file : data.getFilesUpload()) {
             log.info("Uploading file from {} to {}", file.getSource(), file.getDest());
             rt.upload(file.getSource(), file.getDest());
-                    log.info("test zeft batch  ");
 
         }
         rt.disconnect();

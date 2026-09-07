@@ -237,16 +237,27 @@ final public class BatchMonitor extends GaswMonitor {
     }
 
     @Override
-    public synchronized void add(final String jobID, final String symbolicName, final String fileName, final String parameters) throws GaswException {
-        final Job job = new Job(jobID, GaswConfiguration.getInstance().getSimulationID(),
-                GaswStatus.QUEUED, symbolicName, fileName, parameters,
-                Constants.EXECUTOR_NAME,null);
+    public synchronized void add(
+            final String jobID,
+            final String symbolicName,
+            final String fileName,
+            final String parameters) throws GaswException {
+
+        Job job = new Job(
+            jobID,
+            GaswConfiguration.getInstance().getSimulationID(),
+            GaswStatus.QUEUED,
+            symbolicName, 
+            fileName,
+            parameters,
+            Constants.EXECUTOR_NAME,
+            null          
+        );
 
         job.setQueued(new Date());
         add(job);
         log.info("Adding job: {}", jobID);
     }
-
     public synchronized void stopMonitor(boolean force) throws InterruptedException {
         if (force) {
             interrupt();
