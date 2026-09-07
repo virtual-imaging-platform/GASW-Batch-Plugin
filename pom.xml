@@ -13,7 +13,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>21</maven.compiler.release>
-        <gasw-version>4.3</gasw-version>
+        <gasw-version>4.6-SNAPSHOT</gasw-version>
     </properties>
 
     <licenses>

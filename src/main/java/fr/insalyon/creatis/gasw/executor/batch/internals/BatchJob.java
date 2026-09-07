@@ -19,6 +19,8 @@ public class BatchJob {
 
     @Getter
     final private BatchJobData data;
+    private String executionTimeSlurm;
+
 
     @Getter
     private boolean     terminated = false;
@@ -37,6 +39,8 @@ public class BatchJob {
         for (final RemoteFile file : data.getFilesUpload()) {
             log.info("Uploading file from {} to {}", file.getSource(), file.getDest());
             rt.upload(file.getSource(), file.getDest());
+                    log.info("test zeft batch  ");
+
         }
         rt.disconnect();
     }
@@ -162,5 +166,12 @@ public class BatchJob {
         }
         log.warn("Max status retry reached for {}, the job status will defined as STALLED!", getData().getJobID());
         return GaswStatus.STALLED;
+    }
+    public String getExecutionTimeSlurm() {
+    return executionTimeSlurm;
+}
+
+    public void setExecutionTimeSlurm(String executionTimeSlurm) {
+        this.executionTimeSlurm = executionTimeSlurm;
     }
 }
