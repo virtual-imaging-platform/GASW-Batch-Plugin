@@ -60,8 +60,18 @@ public class BatchFileBuilder {
         builder.append("cd " + data.getWorkingDir() + "\n")
                 .append(data.getCommand() + "\n")
                 .append("echo $? > " + data.getExitCodePath() + "\n");
+                // .append("echo \"Slurm execution time: $(sacct -j $SLURM_JOB_ID -n -P --format=ElapsedRaw | head -n 1)\"\n");
     }
-
+//     private void doCommon() {
+//     builder.append("cd " + data.getWorkingDir() + "\n")
+//            .append("GASW_START_TIME=$(date +%s)\n") 
+//            .append(data.getCommand() + "\n")
+//            .append("GASW_EXIT_CODE=$?\n")
+//            .append("GASW_END_TIME=$(date +%s)\n") // 
+//            .append("GASW_ELAPSED=$((GASW_END_TIME - GASW_START_TIME))\n") //
+//            .append("echo \"GASW_SLURM_ELAPSED_TIME: $GASW_ELAPSED\" >> " + data.getStdoutPath() + "\n") //
+//            .append("echo $GASW_EXIT_CODE > " + data.getExitCodePath() + "\n");
+// }
     private void doSlurm() {
         builder.append("#!/bin/sh\n")
                 .append("#SBATCH --job-name=" + data.getJobID() + "\n")
