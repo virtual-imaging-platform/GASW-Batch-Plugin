@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import fr.insalyon.creatis.gasw.executor.batch.internals.commands.RemoteCommand;
 import fr.insalyon.creatis.gasw.executor.batch.internals.commands.items.Qdel;
 import fr.insalyon.creatis.gasw.executor.batch.internals.commands.items.Qsub;
+import fr.insalyon.creatis.gasw.executor.batch.internals.commands.items.Sacct;
 import fr.insalyon.creatis.gasw.executor.batch.internals.commands.items.Sbatch;
 import fr.insalyon.creatis.gasw.executor.batch.internals.commands.items.Scancel;
 import fr.insalyon.creatis.gasw.executor.batch.internals.commands.items.Scontrol;
@@ -14,18 +15,20 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public enum BatchEngine {
 
-    SLURM(Sbatch.class, Scontrol.class, Scancel.class),
-    PBS(Qsub.class, Tracejob.class, Qdel.class);
+    SLURM(Sbatch.class, Scontrol.class, Scancel.class, Sacct.class),
+    PBS(Qsub.class, Tracejob.class, Qdel.class, null);
 
     final private Class<? extends RemoteCommand> submit;
     final private Class<? extends RemoteCommand> status;
     final private Class<? extends RemoteCommand> delete;
+    final private Class<? extends RemoteCommand> metrics;
 
     BatchEngine(Class<? extends RemoteCommand> submitCommand, Class<? extends RemoteCommand> statusCommand,
-            Class<? extends RemoteCommand> deleteCommand) {
+            Class<? extends RemoteCommand> deleteCommand, Class<? extends RemoteCommand> metricsCommand) {
         this.submit = submitCommand;
         this.status = statusCommand;
         this.delete = deleteCommand;
+        this.metrics = metricsCommand;
     }
 
     private RemoteCommand buidler(Class<? extends RemoteCommand> toBuild, final String data) {
@@ -48,5 +51,10 @@ public enum BatchEngine {
 
     public RemoteCommand getDeleteCommand(final String data) {
         return buidler(delete, data);
+    }
+
+    public RemoteCommand getMetricsCommand(final String data) {
+    return buidler(metrics, data);
+    
     }
 }
