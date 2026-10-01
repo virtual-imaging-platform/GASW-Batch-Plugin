@@ -116,19 +116,19 @@ public class BatchManager {
             runner = new BatchRunner();
             runner.start();
         }
-        synchronized (this) {
+        synchronized (this){
             jobs.add(new BatchJob(jobData));
         }
     }
 
-    public BatchJob getJob(final String jobID) {
+    public synchronized BatchJob getJob(final String jobID) {
         return jobs.stream()
                 .filter(job -> job.getData().getJobID().equals(jobID))
                 .findFirst()
                 .orElse(null);
     }
 
-    public List<BatchJob> getUnfinishedJobs() {
+    public synchronized List<BatchJob> getUnfinishedJobs() {
         return jobs.stream()
                 .filter(job -> !job.isTerminated())
                 .collect(Collectors.toList());
