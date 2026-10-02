@@ -61,7 +61,7 @@ public class BatchFileBuilder {
                 .append(data.getCommand() + "\n")
                 .append("echo $? > " + data.getExitCodePath() + "\n");
     }
-
+    
     private void doSlurm() {
         builder.append("#!/bin/sh\n")
                 .append("#SBATCH --job-name=" + data.getJobID() + "\n")
