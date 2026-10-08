@@ -113,10 +113,12 @@ public class BatchManager {
         final BatchJobData jobData = new BatchJobData(jobID, config, workflowId, scriptName);
 
         if (runner == null) {
+            log.info("Starting BatchRunner");
             runner = new BatchRunner();
             runner.start();
         }
         synchronized (this){
+            log.info("Adding new job to BatchManager : {}", jobID);
             jobs.add(new BatchJob(jobData));
         }
     }
@@ -156,7 +158,7 @@ public class BatchManager {
             final Duration diff = new Duration(startedTime, DateTime.now());
 
             if (diff.getStandardSeconds() > config.getOptions().getTimeToBeReady()) {
-                throw new GaswException("Volume wasn't eady in 2 minutes, aborting !");
+                throw new GaswException("Volume wasn't ready in 2 minutes, aborting !");
             } else {
                 Thread.sleep(GaswConfiguration.getInstance().getDefaultSleeptime());
             }

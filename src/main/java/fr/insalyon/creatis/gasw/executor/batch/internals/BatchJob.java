@@ -117,6 +117,7 @@ public class BatchJob {
             command.execute(data.getConfig());
 
             if (command.failed()) {
+                command.logFailure();
                 return GaswStatus.UNDEFINED;
             }
             result = command.result();
@@ -157,6 +158,8 @@ public class BatchJob {
             if (rawStatus != GaswStatus.UNDEFINED) {
                 return rawStatus;
             } else {
+                log.error("Error getting status for jobId {} / BatchJobId {}. Initial Status : {}. Will retry if max not attained",
+                        data.getJobID(), data.getBatchJobID(), status);
                 Thread.sleep(data.getConfig().getOptions().getStatusRetryWait());
             }
         }
