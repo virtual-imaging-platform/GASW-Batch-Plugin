@@ -1,7 +1,8 @@
 package fr.insalyon.creatis.gasw.executor.batch;
 
 import java.util.Date;
-
+import java.util.Map;
+import fr.insalyon.creatis.gasw.bean.JobMetric;
 import fr.insalyon.creatis.gasw.GaswConfiguration;
 import fr.insalyon.creatis.gasw.GaswException;
 import fr.insalyon.creatis.gasw.bean.Job;
@@ -50,10 +51,13 @@ final public class BatchMonitor extends GaswMonitor {
                         if (status == GaswStatus.ERROR || status == GaswStatus.COMPLETED) {
                             daoJob.setExitCode(job.getExitCode());
                             daoJob.setStatus(job.getExitCode() == 0 ? GaswStatus.COMPLETED : GaswStatus.ERROR);
+                            Map<JobMetric, String> metrics = job.generateRemoteMetrics();
+                                if (metrics != null) {
+                                    daoJob.setMetrics(metrics);
+                                } 
                         } else {
                             daoJob.setStatus(status);
                         }
-
                         jobDAO.update(daoJob);
                         new BatchOutputParser(job).start();
 
@@ -63,27 +67,38 @@ final public class BatchMonitor extends GaswMonitor {
                 }
                 Thread.sleep(GaswConfiguration.getInstance().getDefaultSleeptime());
 
-            } catch (GaswException | DAOException ex) {
-                log.error("Exception while monitoring batch jobs. Ignoring to continue the monitoring!", ex);
-            } catch (InterruptedException ex) {
-                log.error("Interrupted exception, stopping the worker!");
-                finish();
-                break;
             }
+            catch (GaswException | DAOException ex) {
+                            log.error("Exception while monitoring batch jobs. Ignoring to continue the monitoring!", ex);
+                        } catch (InterruptedException ex) {
+                            log.error("Interrupted exception, stopping the worker!");
+                            finish();
+                            break;
+                        }
         }
     }
 
     @Override
-    public synchronized void add(final String jobID, final String symbolicName, final String fileName, final String parameters) throws GaswException {
-        final Job job = new Job(jobID, GaswConfiguration.getInstance().getSimulationID(),
-                GaswStatus.QUEUED, symbolicName, fileName, parameters,
-                Constants.EXECUTOR_NAME);
+    public synchronized void add(
+            final String jobID,
+            final String symbolicName,
+            final String fileName,
+            final String parameters) throws GaswException {
 
+        Job job = new Job();
+        job.setId(jobID);
+        job.setSimulationID(GaswConfiguration.getInstance().getSimulationID());
+        job.setStatus(GaswStatus.QUEUED);
+        job.setCommand(symbolicName);
+        job.setFileName(fileName);
+        job.setParameters(parameters);
+        job.setExecutor(Constants.EXECUTOR_NAME);
         job.setQueued(new Date());
+
         add(job);
+
         log.info("Adding job: {}", jobID);
     }
-
     public synchronized void stopMonitor(boolean force) throws InterruptedException {
         if (force) {
             interrupt();

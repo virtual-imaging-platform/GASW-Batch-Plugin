@@ -84,6 +84,10 @@ public class BatchJobData {
         return getWorkingDir() + "err/" + getJobID() + GaswConstants.ERR_EXT;
     }
 
+    public String getMetricsPath() {
+        return getWorkingDir() + "out/" + getJobID() + ".metrics";
+    }
+
     public String getRemoteBatchFile() {
         return getWorkingDir() + getJobID() + ".batch";
     }
