@@ -14,15 +14,11 @@ public class BatchOptions {
 
     /* value in millis */
     @JsonProperty(value = "commandExecutionTimeoutInMillis")
-    private int commandExecutionTimeout = 10;
+    private int commandExecutionTimeout = 10000;
 
     /* value in millis */
     @JsonProperty(value = "sshEventTimeoutInMillis")
     private int sshEventTimeout = 1000;
-
-    /* value in millis, max time to wait for a remote command to finish */
-    @JsonProperty(value = "commandWaitTimeoutInMillis")
-    private int commandWaitTimeout = 60000;
 
     @JsonProperty(value = "statusRetry")
     private int statusRetry = 10;

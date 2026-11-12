@@ -119,14 +119,14 @@ public class RemoteTerminal {
             channel.setOut(stdout);
             channel.setErr(stderr);
 
-            channel.open().verify(config.getOptions().getCommandExecutionTimeout(), TimeUnit.SECONDS);
-            final Set<ClientChannelEvent> events = channel.waitFor(
-                    EnumSet.of(ClientChannelEvent.CLOSED, ClientChannelEvent.EXIT_STATUS),
-                    config.getOptions().getCommandWaitTimeout());
+            channel.open().verify(config.getOptions().getCommandExecutionTimeout(), TimeUnit.MILLISECONDS);
 
-            if (events.contains(ClientChannelEvent.TIMEOUT)) {
-                log.warn("Command timed out after {} ms: {}", config.getOptions().getCommandWaitTimeout(), command);
-            }
+           final Set<ClientChannelEvent> events = channel.waitFor(
+                EnumSet.of(ClientChannelEvent.CLOSED, ClientChannelEvent.EXIT_STATUS),
+                config.getOptions().getCommandExecutionTimeout());
+        if (events.contains(ClientChannelEvent.TIMEOUT)) {
+            log.warn("Command timed out after {} ms: {}", config.getOptions().getCommandExecutionTimeout(), command);
+        }
 
             return new RemoteOutput(stdout.toString(), stderr.toString(), channel.getExitStatus());
         } catch (IOException e) {
