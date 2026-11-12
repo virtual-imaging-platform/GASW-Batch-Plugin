@@ -103,6 +103,7 @@ public class BatchManager {
         try {
             if (remoteCommand.execute(config).failed()) {
                 log.warn("Failed to execute the remote command: {}", remoteCommand.getCommand());
+                remoteCommand.logFailure();
             }
         } catch (GaswException e) {
             log.error("Failed to destroy the batch manager !", e);

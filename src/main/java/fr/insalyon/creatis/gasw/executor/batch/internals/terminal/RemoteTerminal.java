@@ -8,6 +8,7 @@ import java.security.KeyPair;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.concurrent.TimeUnit;
+import java.util.Set;
 
 import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.channel.ChannelExec;
@@ -118,8 +119,14 @@ public class RemoteTerminal {
             channel.setOut(stdout);
             channel.setErr(stderr);
 
-            channel.open().verify(config.getOptions().getCommandExecutionTimeout(), TimeUnit.SECONDS);
-            channel.waitFor(EnumSet.of(ClientChannelEvent.CLOSED, ClientChannelEvent.EXIT_STATUS), config.getOptions().getSshEventTimeout());
+            channel.open().verify(config.getOptions().getCommandExecutionTimeout(), TimeUnit.MILLISECONDS);
+
+           final Set<ClientChannelEvent> events = channel.waitFor(
+                EnumSet.of(ClientChannelEvent.CLOSED, ClientChannelEvent.EXIT_STATUS),
+                config.getOptions().getCommandExecutionTimeout());
+        if (events.contains(ClientChannelEvent.TIMEOUT)) {
+            log.warn("Command timed out after {} ms: {}", config.getOptions().getCommandExecutionTimeout(), command);
+        }
 
             return new RemoteOutput(stdout.toString(), stderr.toString(), channel.getExitStatus());
         } catch (IOException e) {
