@@ -33,7 +33,7 @@ public class BatchExecutor implements ExecutorPlugin {
     @Override
     public void load(final GaswInput gaswInput) throws GaswException {
         if ( ! loaded) {
-            final BatchConfig config = new ConfigBuilder(Constants.PLUGIN_CONFIG).get();
+            final BatchConfig config = new ConfigBuilder(Constants.getPluginConfig()).get();
 
             manager = new BatchManager(GaswConfiguration.getInstance().getSimulationID(), config);
             manager.init();
@@ -57,6 +57,11 @@ public class BatchExecutor implements ExecutorPlugin {
     }
 
     @Override
+    public GaswInput getGaswInput() {
+        return submitter.getGaswInput();
+    }
+
+    @Override
     public void terminate(boolean force) throws GaswException {
         if ( ! loaded) {
             return;
@@ -66,8 +71,10 @@ public class BatchExecutor implements ExecutorPlugin {
             monitor.stopMonitor(force);
 
             manager.clean();
+            loaded = false;
         } catch (InterruptedException e) {
             log.warn("Hard-kill occured!");
+            loaded = false;
         }
     }
 }
