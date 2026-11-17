@@ -25,7 +25,7 @@ public class BatchOptions {
 
     /* value in millis */
     @JsonProperty(value = "statusRetryWaitInMillis")
-    private int statusRetryWait = 10;
+    private int statusRetryWait = 10000;
 
     /* By default the system uses slurm */
     @JsonProperty(value = "batchEngine")
