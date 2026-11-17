@@ -14,7 +14,7 @@ public class BatchOptions {
 
     /* value in millis */
     @JsonProperty(value = "commandExecutionTimeoutInMillis")
-    private int commandExecutionTimeout = 10;
+    private int commandExecutionTimeout = 10000;
 
     /* value in millis */
     @JsonProperty(value = "sshEventTimeoutInMillis")
@@ -25,7 +25,7 @@ public class BatchOptions {
 
     /* value in millis */
     @JsonProperty(value = "statusRetryWaitInMillis")
-    private int statusRetryWait = 10;
+    private int statusRetryWait = 10000;
 
     /* By default the system uses slurm */
     @JsonProperty(value = "batchEngine")
